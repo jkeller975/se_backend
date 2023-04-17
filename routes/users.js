@@ -1,0 +1,71 @@
+const router = require("express").Router();
+const { celebrate, Joi } = require("celebrate");
+const validator = require("validator");
+
+const {
+  getUsers,
+  getProfile,
+  getCurrentUser,
+  createUser,
+  updateProfile,
+  updateAvatar,
+} = require("../controllers/users");
+
+function validateUrl(string) {
+  if (!validator.isURL(string)) {
+    throw new Error("Invalid URL");
+  }
+  return string;
+}
+
+const authValidation = Joi.object()
+  .keys({
+    authorization: Joi.string().required(),
+  })
+  .unknown(true);
+
+const userIdValidation = Joi.object().keys({
+  userId: Joi.string().hex().length(24),
+});
+
+router.get("/", getUsers);
+router.get("/me", getCurrentUser);
+router.get("/:userId", getProfile);
+router.post("/", createUser);
+router.patch("/me", updateProfile);
+router.patch("/me/avatar", updateAvatar);
+
+// router.get("/", celebrate({ headers: authValidation }), getUsers);
+// router.get("/me", celebrate({ headers: authValidation }), getCurrentUser);
+// router.get(
+//   "/:userId",
+//   celebrate({
+//     params: userIdValidation,
+//     headers: authValidation,
+//   }),
+//   getProfile
+// );
+// router.post("/", createUser);
+// router.patch(
+//   "/me",
+//   celebrate({
+//     body: Joi.object().keys({
+//       name: Joi.string().required().min(2).max(40),
+//       about: Joi.string().required().min(2).max(200),
+//     }),
+//     headers: authValidation,
+//   }),
+//   updateProfile
+// );
+// router.patch(
+//   "/me/avatar",
+//   celebrate({
+//     body: Joi.object().keys({
+//       avatar: Joi.string().required().custom(validateUrl),
+//     }),
+//     headers: authValidation,
+//   }),
+//   updateAvatar
+// );
+
+module.exports = router;
