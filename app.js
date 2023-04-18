@@ -10,6 +10,8 @@ const { NOT_FOUND } = require("./utils/errors");
 
 const { PORT = 3000 } = process.env;
 
+const { MONGO_URI } = process.env;
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -18,7 +20,7 @@ app.use((req, res, next) => {
 });
 
 mongoose.set("strictQuery", false); // Added due to DeprecationWarning being thrown
-mongoose.connect("mongodb://localhost:27017/aroundb", {
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
