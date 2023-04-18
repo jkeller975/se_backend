@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { errors } = require("celebrate");
-// const cors = require("cors");
+const cors = require("cors");
 // const usersRouter = require("./routes/users");
 // const cardsRouter = require("./routes/cards");
 const routes = require("./routes/index");
@@ -25,7 +25,7 @@ mongoose.connect(MONGO_URI, {
   useUnifiedTopology: true,
 });
 app.use(express.json());
-// app.use(cors());
+app.use(cors());
 // app.options("*", cors());
 app.use(routes);
 
