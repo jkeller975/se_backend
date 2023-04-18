@@ -1,1 +1,1 @@
-module.exports.linkRegex = /https?:\/\/(www\.)?\S+/g;
+module.exports.linkRegex = /https?:\/\/(www\.)?\S+/;
