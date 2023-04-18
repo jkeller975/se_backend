@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const BadRequestError = require("../errors/bad-request error");
-const NotFoundError = require("../errors/not-found-error");
+// const NotFoundError = require("../errors/not-found-error");
 const UnauthorizedError = require("../errors/unauthorized-error");
 const ConflictError = require("../errors/conflict-error");
 const checkErrors = require("../utils/errors");
@@ -17,7 +17,7 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
-const getProfile = (req, res, next) => {
+const getProfile = (req, res) => {
   User.findById(req.params.userId)
     .orFail(new Error("Not Found"))
     .then((users) => {
