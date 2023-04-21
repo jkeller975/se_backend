@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/jkeller975/se_project_express#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "celebrate": "^15.0.1",
     "cors": "^2.8.5",

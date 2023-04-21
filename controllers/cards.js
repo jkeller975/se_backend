@@ -17,9 +17,10 @@ const getCards = (req, res, next) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  return Card.create({ name, link, owner: req.user._id })
+  Card.create({ name, link, owner: req.user._id })
+    .then((card) => card.populate("owner"))
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.send({ data: card });
     })
     .catch((err) => {
       checkErrors({ res, err });
@@ -42,6 +43,8 @@ const likeCard = (req, res) =>
     { new: true }
   )
     .orFail(new Error("Not Found"))
+    .populate("likes")
+    .populate("owner")
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       checkErrors({ res, err });
@@ -54,6 +57,8 @@ const dislikeCard = (req, res) =>
     { new: true }
   )
     .orFail(new Error("Not Found"))
+    .populate("likes")
+    .populate("owner")
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       checkErrors({ res, err });

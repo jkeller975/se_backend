@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const { linkRegex } = require("../utils/regex");
 
 const userSchema = new mongoose.Schema(
@@ -20,11 +20,11 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: "https://pictures.s3.yandex.net/resources/avatar_1604080799.jpg",
-      // validate: {
-      //   validator(v) {
-      //     return linkRegex.test(v);
-      //   },
-      // },
+      validate: {
+        validator(v) {
+          return linkRegex.test(v);
+        },
+      },
     },
     email: {
       type: String,
