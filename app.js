@@ -20,14 +20,12 @@ app.use((req, res, next) => {
 });
 
 mongoose.set("strictQuery", false); // Added due to DeprecationWarning being thrown
-mongoose.connect(
-  "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.8.0",
-  // mongoose.connect("mongodb://localhost:27017/aroundb",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+// mongoose.connect(
+// "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.8.0",
+mongoose.connect("mongodb://localhost:27017/aroundb", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 app.use(express.json());
 app.use(cors());
 app.options("*", cors());
