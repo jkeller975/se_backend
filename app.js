@@ -14,11 +14,6 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.use((req, res, next) => {
-  req.user = { _id: "63fbe1ab9920f97d958c0174" };
-  next();
-});
-
 mongoose.set("strictQuery", false); // Added due to DeprecationWarning being thrown
 mongoose.connect(
   "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.8.0",
