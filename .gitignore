@@ -13,3 +13,13 @@ node_modules
 .DS_Store
 .idea
 .vscode
+
+# production
+**/build
+
+# misc
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+frontend/.env

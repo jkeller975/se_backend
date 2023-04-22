@@ -6,9 +6,9 @@ const NotFoundError = require("../errors/not-found-error");
 const UnauthorizedError = require("../errors/unauthorized-error");
 const ConflictError = require("../errors/conflict-error");
 const checkErrors = require("../utils/errors");
+require("dotenv").config();
 
-// const { JWT_SECRET } = process.env;
-const JWT_SECRET = "codingisfun";
+const { JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
   User.find({})
