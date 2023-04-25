@@ -16,23 +16,16 @@ function validateUrl(string) {
   return string;
 }
 
-const authValidation = Joi.object()
-  .keys({
-    authorization: Joi.string().required(),
-  })
-  .unknown(true);
-
 const userIdValidation = Joi.object().keys({
   userId: Joi.string().hex().length(24),
 });
 
-router.get("/", celebrate({ headers: authValidation }), getUsers);
-router.get("/me", celebrate({ headers: authValidation }), getCurrentUser);
+router.get("/", getUsers);
+router.get("/me", getCurrentUser);
 router.get(
   "/:userId",
   celebrate({
     params: userIdValidation,
-    headers: authValidation,
   }),
   getProfile
 );
@@ -41,10 +34,9 @@ router.patch(
   "/me",
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().required().min(2).max(40),
-      about: Joi.string().required().min(2).max(200),
+      name: Joi.string().required().min(2).max(30),
+      about: Joi.string().required().min(2).max(30),
     }),
-    headers: authValidation,
   }),
   updateProfile
 );
@@ -54,7 +46,6 @@ router.patch(
     body: Joi.object().keys({
       avatar: Joi.string().required().custom(validateUrl),
     }),
-    headers: authValidation,
   }),
   updateAvatar
 );
