@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { celebrate, Joi } = require("celebrate");
+const validator = require("validator");
 const {
   getCards,
   createCard,
@@ -8,24 +9,32 @@ const {
   dislikeCard,
 } = require("../controllers/cards");
 
-const authValidation = Joi.object()
-  .keys({
-    authorization: Joi.string().required(),
-  })
-  .unknown(true);
+function validateUrl(string) {
+  if (!validator.isURL(string)) {
+    throw new Error("Invalid URL");
+  }
+  return string;
+}
 
-router.get("/", celebrate({ headers: authValidation }), getCards);
+const cardIdValidation = Joi.object().keys({
+  cardId: Joi.string().hex().length(24),
+});
+
+router.get("/", getCards);
 router.post(
   "/",
   celebrate({
-    headers: authValidation,
+    body: Joi.object().keys({
+      name: Joi.string().required().min(2).max(30),
+      link: Joi.string().required().custom(validateUrl),
+    }),
   }),
   createCard
 );
 router.delete(
   "/:cardId",
   celebrate({
-    headers: authValidation,
+    params: cardIdValidation,
   }),
   deleteCard
 );
@@ -33,7 +42,7 @@ router.delete(
 router.put(
   "/:cardId/likes",
   celebrate({
-    headers: authValidation,
+    params: cardIdValidation,
   }),
   likeCard
 );
@@ -41,7 +50,7 @@ router.put(
 router.delete(
   "/:cardId/likes",
   celebrate({
-    headers: authValidation,
+    params: cardIdValidation,
   }),
   dislikeCard
 );

@@ -8,7 +8,7 @@ const ConflictError = require("../errors/conflict-error");
 const checkErrors = require("../utils/errors");
 require("dotenv").config();
 
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -120,9 +120,13 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "dev",
+        {
+          expiresIn: "7d",
+        }
+      );
       res.send({ data: user.toJSON(), token });
     })
     .catch(() => {

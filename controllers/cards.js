@@ -28,12 +28,25 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  const id = req.params.cardId;
+
+  Card.findById(id)
     .orFail(new Error("Not Found"))
-    .then(() => res.status(200).send({ message: "Card deleted" }))
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        return new Error("You are not the owner of the card");
+      }
+      return card.deleteOne().then(() => res.send({ message: "Card Deleted" }));
+    })
     .catch((err) => {
       checkErrors({ res, err });
     });
+  // Card.findByIdAndDelete(id)
+  //   .orFail(new Error("Not Found"))
+  //   .then(() => res.status(200).send({ message: "Card deleted" }))
+  //   .catch((err) => {
+  //     checkErrors({ res, err });
+  //   });
 };
 
 const likeCard = (req, res) =>

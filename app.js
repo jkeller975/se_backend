@@ -2,14 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { errors } = require("celebrate");
 const cors = require("cors");
-
+const { celebrate, Joi } = require("celebrate");
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const signin = require("./routes/signin");
 const signup = require("./routes/signup");
-const { NOT_FOUND } = require("./utils/errors");
 const auth = require("./middleware/auth");
 const { requestLogger, errorLogger } = require("./middleware/logger");
+const NotFoundError = require("./errors/not-found-error");
 
 const { PORT = 3000 } = process.env;
 
@@ -34,17 +34,40 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-app.use("/signin", signin);
-app.use("/signup", signup);
+app.use(
+  "/signin",
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  signin
+);
+app.use(
+  "/signup",
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  signup
+);
 app.use(auth);
 app.use("/users", usersRouter);
 app.use("/cards", cardsRouter);
-app.use(errorLogger);
 app.use((req, res, next) => {
-  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
-  next();
+  next(new NotFoundError("Not Found"));
+});
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500 ? "An error occurred on the server" : message,
+  });
 });
 app.use(errors());
+app.use(errorLogger);
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`App listening at port ${PORT}`);
