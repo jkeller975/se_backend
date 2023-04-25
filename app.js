@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { errors } = require("celebrate");
 const cors = require("cors");
 const { celebrate, Joi } = require("celebrate");
+const validator = require("validator");
 const usersRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const signin = require("./routes/signin");
@@ -10,6 +11,20 @@ const signup = require("./routes/signup");
 const auth = require("./middleware/auth");
 const { requestLogger, errorLogger } = require("./middleware/logger");
 const NotFoundError = require("./errors/not-found-error");
+
+function validateEmail(string) {
+  if (!validator.isEmail(string)) {
+    throw new Error("Invalid Email");
+  }
+  return string;
+}
+
+function validateUrl(string) {
+  if (!validator.isURL(string)) {
+    throw new Error("Invalid URL");
+  }
+  return string;
+}
 
 const { PORT = 3000 } = process.env;
 
@@ -38,7 +53,7 @@ app.use(
   "/signin",
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string().required().custom(validateEmail),
       password: Joi.string().required(),
     }),
   }),
@@ -48,8 +63,11 @@ app.use(
   "/signup",
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string().required().custom(validateEmail),
       password: Joi.string().required(),
+      name: Joi.string().required().min(2).max(30),
+      about: Joi.string().required().min(2).max(30),
+      avatar: Joi.string().required().custom(validateUrl),
     }),
   }),
   signup
@@ -57,6 +75,7 @@ app.use(
 app.use(auth);
 app.use("/users", usersRouter);
 app.use("/cards", cardsRouter);
+app.use(errors());
 app.use((req, res, next) => {
   next(new NotFoundError("Not Found"));
 });
@@ -66,7 +85,6 @@ app.use((err, req, res, next) => {
     message: statusCode === 500 ? "An error occurred on the server" : message,
   });
 });
-app.use(errors());
 app.use(errorLogger);
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

@@ -5,7 +5,6 @@ const BadRequestError = require("../errors/bad-request error");
 const NotFoundError = require("../errors/not-found-error");
 const UnauthorizedError = require("../errors/unauthorized-error");
 const ConflictError = require("../errors/conflict-error");
-const checkErrors = require("../utils/errors");
 require("dotenv").config();
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -18,14 +17,17 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
-const getProfile = (req, res) => {
+const getProfile = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new NotFoundError("Not Found"))
     .then((users) => {
       res.send({ data: users });
     })
     .catch((err) => {
-      checkErrors({ res, err });
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid userId"));
+      }
+      return next(err);
     });
 };
 
@@ -83,7 +85,7 @@ const createUser = (req, res, next) => {
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   const { _id } = req.user;
 
@@ -97,11 +99,14 @@ const updateProfile = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      checkErrors({ res, err });
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid data"));
+      }
+      return next(err);
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { _id } = req.user;
 
@@ -111,7 +116,10 @@ const updateAvatar = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      checkErrors({ res, err });
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid data"));
+      }
+      return next(err);
     });
 };
 
